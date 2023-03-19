@@ -54,17 +54,17 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
 
-    # def test_create_recipe(self):
-    #     """Test creating a recipe is succesfull."""
-    #     user = get_user_model().objects.create_user(
-    #         'test@example.123',
-    #         'testpass123'
-    #     )
-    #     recipe = models.Recipe.objects.create(
-    #         user=user,
-    #         title='Sample recipe title.',
-    #         time_minutes=5,
-    #         price=Decimal('5.50'),
-    #         description='Sample recepie description.'
-    #     )
-    #     self.assertEqual(str(recipe), recipe.title)
+    def test_create_recipe(self):
+        """Test creating a recipe is succesfull."""
+        user = get_user_model().objects.create_user(
+            'test@example.123',
+            'testpass123'
+        )
+        recipe = models.Recipe.objects.create(
+            user=user,
+            title='Sample recipe title.',
+            time_minutes=5,
+            price=Decimal('5.50'),
+            description='Sample recepie description.'
+        )
+        self.assertEqual(str(recipe), recipe.title)
