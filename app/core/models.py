@@ -1,6 +1,7 @@
 """
 Database models.
 """
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -35,7 +36,15 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """User in the system."""
+    """
+    Model for creating User for authentication and creating blogs.
+
+    Attribs:
+        email (str): Email of the user.
+        name (str): Name of the user.
+        is_active (bool): Whether user is active or not.
+        is_staff (bool): Whether user is a staff or not.
+    """
 
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -45,3 +54,31 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Recipe(models.Model):
+    """
+    Model for creating recipe.
+
+    Attribs:
+        user (obj): Author of the recipe.
+        title (str): Title of the recipe.
+        description (str): Description of the recipe.
+        time_minutes (datetime): Time taken to cook the recipe.
+        price (float): Price required to pay for the recipe.
+        link (str): Link of the recipe.
+
+
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    time_minutes = models.IntegerField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    link = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.title
