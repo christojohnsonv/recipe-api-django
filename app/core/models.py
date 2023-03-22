@@ -80,6 +80,7 @@ class Recipe(models.Model):
     price = models.DecimalField(max_digits=5, decimal_places=2)
     link = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField('Tag',)
+    ingredients = models.ManyToManyField('Ingredient',)
 
     def __str__(self):
         return self.title
@@ -92,6 +93,24 @@ class Tag(models.Model):
     Attribs:
         name (str): Name of the tag.
         user (obj): User who has created the tag.
+    """
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class Ingredient(models.Model):
+    """
+    Model for creating the ingredient.
+
+    Attribs:
+        name (str): Name of the tag.
+        user (obj): User who has created the ingredient.
     """
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
