@@ -33,6 +33,7 @@ class PublicTagsApiTests(TestCase):
         self.client = APIClient()
 
     def test_auth_required(self):
+        """Test get api without authorization."""
         res = self.client.get(TAGS_URL)
 
         self.assertEqual(res.status_code,  status.HTTP_401_UNAUTHORIZED)
@@ -53,7 +54,7 @@ class PrivateTagsApiTests(TestCase):
 
         res = self.client.get(TAGS_URL)
 
-        tags = Tag.objects.all().order_by('-id')
+        tags = Tag.objects.all().order_by('-name')
         serializer = TagSerializer(tags, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
