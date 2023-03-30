@@ -1,14 +1,19 @@
 """
 Tests for the tags API.
 """
+from core.models import (
+    Recipe,
+    Tag,
+)
+
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
 
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from core.models import Tag
 
 from recipe.serializers import TagSerializer
 
@@ -94,42 +99,42 @@ class PrivateTagsApiTests(TestCase):
         tags = Tag.objects.filter(id=tag.id)
         self.assertFalse(tags.exists())
 
-    # def test_filter_tags_assigned_to_recipes(self):
-    #     """Test listing tags by those assigned to recipes."""
-    #     in1 = Tags.objects.create(user=self.user, name='Apple')
-    #     in2 = Tags.objects.create(user=self.user, name='Turkey')
-    #     recipe = Recipe.objects.create(
-    #         title='Apple Crumble',
-    #         time_minutes=5,
-    #         price=Decimal('4.59'),
-    #         user=self.user
-    #     )
-    #     recipe.ingredients.add(in1)
-    #     res=self.client.get(INGREDIENT_URL, {'assigned_only': 1})
-    #     s1 = IngredientSerializer(in1)
-    #     s2 = IngredientSerializer(in2)
-    #     self.assertIn(s1.data, res.data)
-    #     self.assertNotIn(s2.data, res.data)
+    def test_filter_tags_assigned_to_recipes(self):
+        """Test listing tags by those assigned to recipes."""
+        tag1 = Tag.objects.create(user=self.user, name='Breakfast')
+        tag2 = Tag.objects.create(user=self.user, name='Lunch')
+        recipe = Recipe.objects.create(
+            title='Green eggs on toast',
+            time_minutes=5,
+            price=Decimal('4.59'),
+            user=self.user
+        )
+        recipe.tags.add(tag1)
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+        s1 = TagSerializer(tag1)
+        s2 = TagSerializer(tag2)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
 
-    # def test_filtered_ingredients_unique(self):
-    #     """Test filtered ingredients return a unique list."""
-    #     in1 = Tags.objects.create(user=self.user, name='Apple')
-    #     Tags.objects.create(user=self.user, name='Turkey')
-    #     recipe1 = Recipe.objects.create(
-    #         title='Apple Crumble',
-    #         time_minutes=5,
-    #         price=Decimal('4.59'),
-    #         user=self.user
-    #     )
-    #     recipe2 = Recipe.objects.create(
-    #         title='Chicken Shawai',
-    #         time_minutes=30,
-    #         price=Decimal('459'),
-    #         user=self.user
-    #     )
-    #     recipe1.ingredients.add(in1)
-    #     recipe2.ingredients.add(in1)
+    def test_filtered_tags_unique(self):
+        """Test filtered tags return a unique list."""
+        tag = Tag.objects.create(user=self.user, name='Breakfast')
+        Tag.objects.create(user=self.user, name='Lunch')
+        recipe1 = Recipe.objects.create(
+            title='Pancakes',
+            time_minutes=5,
+            price=Decimal('4.59'),
+            user=self.user
+        )
+        recipe2 = Recipe.objects.create(
+            title='Porridge',
+            time_minutes=30,
+            price=Decimal('459'),
+            user=self.user
+        )
+        recipe1.tags.add(tag)
+        recipe2.tags.add(tag)
 
-    #     res = self.client.get(INGREDIENT_URL, {'assigned_only': 1})
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
 
-    #     self.assertEqual(len(res.data), 1)
+        self.assertEqual(len(res.data), 1)
