@@ -18,7 +18,30 @@ from core.models import (
 )
 from recipe import serializers
 
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter,
+)
 
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'tags',
+                OpenApiTypes.STR,
+                description='Comma separated list of IDs to filter.'
+            ),
+            OpenApiParameter(
+                'ingredients',
+                OpenApiTypes.STR,
+                description='Comma separated list of IDs to filter.'
+            )
+        ]
+    )
+)
 class RecipeViewset(viewsets.ModelViewSet):
     """Viewset for managing recipe APIs."""
     serializer_class = serializers.RecipeDetailSerializer
@@ -26,8 +49,24 @@ class RecipeViewset(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def _params_to_ints(self, string_of_ids):
+        """Convert a list of string to integers."""
+        return [int(str_id) for str_id in string_of_ids.split(',')]
+
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by('-id')
+        # TODO: Must be optimised using Q filter. Try django-filters if needed.
+        tags = self.request.query_params.get('tags')
+        ingredients = self.request.query_params.get('ingredients')
+        queryset = self.queryset
+        if tags:
+            tag_ids = self._params_to_ints(tags)
+            queryset = queryset.filter(tags__id__in=tag_ids)
+        if ingredients:
+            ingredient_ids = self._params_to_ints(ingredients)
+            queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+        return queryset.filter(
+            user=self.request.user
+        ).order_by('-id').distinct()
 
     def get_serializer_class(self):
         """Return the serializer class for request."""
