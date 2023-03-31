@@ -29,8 +29,8 @@ services:
       - POSTGRES_DB=devdb
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=devpassword
+      - DEBUG=1
 
 volumes:
   dev-db-data:
   dev-static-data:
-
