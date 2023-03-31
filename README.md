@@ -4,6 +4,7 @@
 ## Development Server
 ```sudo docker compose up```
 ### Requirements 
+- Docker
 
 
 
