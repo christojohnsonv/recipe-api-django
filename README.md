@@ -2,8 +2,9 @@
 
 
 ## Development Server
-```sudo docker compose -f docker-compose.dev.yml up```
+```sudo docker compose up```
 ### Requirements 
+- Docker
 
 
 
